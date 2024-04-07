@@ -3,11 +3,10 @@
     "name": "party-death-markers",
     "author": "teralove",
     "description": "Spawn beacons on top of dead party members.",
-    "version": "9/16/2019",
-    "donationUrl": "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=PXRFYB39SQP4A",
     "options": {
+        "cliName": "Party Death Markers",
+        "guiName": "Party Death Markers",
         "niceName": "Party Death Markers"
     },
-    "servers": ["https://raw.githubusercontent.com/teralove/party-death-markers/master/"],
-    "supportUrl": "https://github.com/teralove/party-death-markers/issues/"
+    "servers": ["https://raw.githubusercontent.com/FrostSigil/party-death-markers/master/"]
 }
