@@ -1,5 +1,5 @@
-
 module.exports = function PartyDeathMarkers(mod) {
+	const skillIds = [100100, 120100, 60410100, 60410101, 60410102];
 	let members = [];
 	let markers = [];
 
@@ -14,20 +14,25 @@ module.exports = function PartyDeathMarkers(mod) {
 	});
 
 	mod.hook("S_SPAWN_USER", "*", event => {
-		if (!event.alive)
+		if (!event.alive) {
 			spawnMarker(members.find(member => member.gameId === event.gameId), event.loc);
+		}
+	});
+
+	mod.hook("S_DESPAWN_USER", 3, event => {
+		if (event.type === 1) return;
+		removeMarker(members.find(member => member.gameId === event.gameId));
 	});
 
 	mod.hook("S_PARTY_MEMBER_STAT_UPDATE", "*", event => {
-		if (mod.game.me.playerId === event.playerId)
-			return;
-
-		if (markers.length > 0 && event.alive && event.curHp > 0)
+		if (mod.game.me.playerId === event.playerId) return;
+		if (markers.length > 0 && event.alive && event.curHp > 0) {
 			removeMarker(members.find(member => member.playerId === event.playerId));
+		}
 	});
 
 	mod.hook("S_EACH_SKILL_RESULT", "*", event => {
-		if (event.skill.id === 60410102 || event.skill.id === 120100) {
+		if (skillIds.includes(event.skill.id)) {
 			removeMarker(members.find(member => member.gameId === event.target));
 		}
 	});
@@ -42,21 +47,20 @@ module.exports = function PartyDeathMarkers(mod) {
 	});
 
 	function spawnMarker(member, loc) {
-		if (!member || mod.game.me.is(member.gameId))
-			return;
+		if (!member || mod.game.me.is(member.gameId)) return;
 
 		removeMarker(member);
 		markers.push(member.playerId);
 
 		mod.toClient("S_SPAWN_DROPITEM", "*", {
 			gameId: member.playerId,
-			loc: loc.addN(0, 0, -100),
+			loc: loc.addN(0, 0, -75),
 			item: getMarker(member.class),
 			amount: 1,
 			expiry: 0,
 			owners: [{ playerId: mod.game.me.playerId }]
 		});
-	}
+	};
 
 	function getMarker(classid) {
 		switch (classid) {
@@ -68,12 +72,11 @@ module.exports = function PartyDeathMarkers(mod) {
 				return 89141;
 			default:
 				return 89604;
-		}
-	}
+		};
+	};
 
 	function removeMarker(member) {
-		if (!member)
-			return;
+		if (!member) return;
 
 		const id = member.playerId;
 		if (markers.includes(id)) {
@@ -81,11 +84,11 @@ module.exports = function PartyDeathMarkers(mod) {
 				gameId: id
 			});
 			markers = markers.filter(marker => marker !== id);
-		}
-	}
+		};
+	};
 
 	function removeAllMarkers() {
 		members.forEach(member => removeMarker(member));
 		markers = [];
-	}
+	};
 };
